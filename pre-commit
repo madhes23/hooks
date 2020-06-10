@@ -1,0 +1,93 @@
+#!/bin/sh
+
+if [ ! -d .cache/ ]; then
+  mkdir .cache
+  echo "Creating a .cache directory to store temproary files"
+  #if cache dir doesnt exist, create one to store temp files
+fi
+
+package=".cache/packages.txt"
+newfiles=".cache/newfiles.txt"
+newfilestoprocess=".cache/newfilestoprocess.txt"
+pmdResultsfile=".cache/pmdResultsCache.txt"
+#creating variable and store frequently used values for better reading
+
+
+if [ -f $pmdResultsfile ]; then
+  count=`ls .cache/*pmdResultsCache.txt | wc -l`
+  if [ $count -gt 0 ]; then
+    pmdResultsfile=".cache/$count-pmdResultsCache.txt"
+  fi
+fi
+touch $pmdResultsfile
+#create a temporary file to store all the results of pmd execution
+
+if [ -f $newfilestoprocess ]; then
+  count=`ls .cache/*newfilestoprocess.txt | wc -l`
+  if [ $count -gt 0 ]; then
+    newfilestoprocess=".cache/$count-newfilestoprocess.txt"
+  fi
+fi
+touch $newfilestoprocess
+
+if [ -f $newfiles ]; then
+  count=`ls .cache/*newfiles.txt | wc -l`
+  if [ $count -gt 0 ]; then
+    newfiles=".cache/$count-newfiles.txt"
+  fi
+fi
+touch $newfiles
+
+if [ -f $package ]; then
+  count=`ls .cache/*packages.txt | wc -l`
+  if [ $count -gt 0 ]; then
+    package=".cache/$count-packages.txt"
+  fi
+fi
+touch $package
+
+git status --porcelain | grep "^A\|^ M\|^AM" | cut -c 4- > $newfiles
+#geting Added (and (or) or) Modified file filenames 
+#and storing the file name in newfiles.txt
+
+sed 's/\./\//g' .packages | sed 's/ //g' > $package
+#convert packages to directory structure and remove empty spaces
+
+while IFS= read -r line
+do
+  var=${line%?}
+  #remove the trailing charecter in the line variable and use it for comparision
+  grep "$var" $newfiles >> $newfilestoprocess
+done < $package
+
+echo "Packages to be included"
+cat $package
+echo "\n"
+echo "The following files will be processed for pmd analysis..."
+cat $newfilestoprocess
+echo "\n"
+
+while IFS= read -r line
+do
+  run.sh pmd -d $line -R rulesets/java.xml -f text >> $pmdResultsfile
+done < "$newfilestoprocess"
+#run pmd and append the results to pmdResultsCache.txt file
+
+ERR_COUNT=`grep -c "PMDERR" $pmdResultsfile`
+#count the no. of errors recorded
+
+if [ $ERR_COUNT -gt 0 ]
+then
+  cat $pmdResultsfile
+  #print the location of pmdResultsCache.txt and error messages in the terminal  
+  retrunVal=1
+else
+  retrunVal=0
+fi
+
+rm $package
+rm $newfiles
+rm $newfilestoprocess
+rm $pmdResultsfile
+
+return $retrunVal
