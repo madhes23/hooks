@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<ruleset name="Custom Rules"
+    xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0 https://pmd.sourceforge.io/ruleset_2_0_0.xsd">
+
+    <include-pattern>./src/*.java</include-pattern>
+    <description>
+        PMD description
+    </description>
+
+    
+
+    <rule ref="category/java/design.xml/AvoidDeeplyNestedIfStmts"
+        message="PMDERR_DEEPIF Avoid using deeply nested if stmt" >
+        <properties>
+            <property name="problemDepth" value="3" />
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/ExcessiveMethodLength"
+        message="PMDERR_LONGMETH Method is too big" >
+        <properties>
+            <property name="minimum" value="40.0" />
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/TooManyMethods"
+        message="PMDERR_MANYMETH Too many methods in the class">
+        <properties>
+            <property name="maxmethods" value="50" />
+        </properties>
+    </rule>
+    <rule ref="category/java/design.xml/ExcessiveClassLength"
+        message="PMDERR_LONGCLS Class is too big">
+        <properties>
+            <property name="minimum" value="2200.0" />
+        </properties>
+    </rule>
+
+    <rule ref="category/java/design.xml/ExcessiveParameterList"
+        message="PMDERR_MANYPARA Too many parameters">
+        <properties>
+            <property name="minimum" value="4.0" />
+        </properties>
+    </rule>
+
+
+
+</ruleset>
