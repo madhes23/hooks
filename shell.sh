@@ -1,3 +1,6 @@
+packfile=".packages"
+#change the location here in case, .packages file stored at somewhere else
+
 currentDir=`pwd`
 cd $HOME
 if [ ! -d pmd-bin* ];then
@@ -7,8 +10,8 @@ fi
 
 cd $currentDir 
 
-if [ ! -f .packages ];then  #get the input automate
-	echo "create a file \".packages\" in pwd and write the packages to be included for the pmd analysis"
+if [ ! -f $packfile ];then  #get the input automate
+	echo "create a file \"$packfile\" in pwd and write the packages to be included for the pmd analysis"
 	exit
 fi
 
