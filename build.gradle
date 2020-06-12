@@ -1,0 +1,22 @@
+tasks.register("pmdSetup") { 
+    doLast {
+        File packfile = new File(".packages") 
+        ant.get(src: 'https://github.com/pmd/pmd/releases/download/pmd_releases%2F6.24.0/pmd-bin-6.24.0.zip', dest: '/home/elcot', skipexisting: 'true')
+        ant.unzip(src: '/home/elcot' + '/pmd-bin-6.24.0.zip', dest: '/home/elcot')
+ 
+        if(! packfile.exists()){
+            throw new Exception('.packages file not found is the configured path')
+        }
+
+        mkdir "rulesets"
+        "wget https://raw.githubusercontent.com/madhes23/hooks/master/rulesets/java.xml -O rulesets/java.xml".execute()
+
+        File git = new File(".git")
+        if(!git.isDirectory()){
+            throw new Exception('.git folder not found, kindly initialize a git repo')
+        }
+
+        "rm .git/hooks/pre-commit.sample".execute()
+        "wget https://raw.githubusercontent.com/madhes23/hooks/master/pre-commit -O .git/hooks/pre-commit".execute()
+    }
+}
